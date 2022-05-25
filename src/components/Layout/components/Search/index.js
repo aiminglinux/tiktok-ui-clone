@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames/bind';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import * as searchService from '~/apiServices/searchService';
 import styles from './Search.module.scss';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
 import AccountItem from '~/components/AccountItem';
@@ -48,17 +49,17 @@ function Search() {
             setSearchResult([]);
             return;
         }
-        setLoading(true);
 
-        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(debounced)}&type=less`)
-            .then((res) => res.json())
-            .then((res) => {
-                setSearchResult(res.data);
-                setLoading(false);
-            })
-            .catch(() => {
-                setLoading(false);
-            });
+        const fetchAPI = async () => {
+            setLoading(true);
+
+            const searchResult = await searchService.search(debounced);
+
+            setSearchResult(searchResult);
+            setLoading(false);
+        };
+
+        fetchAPI();
     }, [debounced]);
 
     return (
